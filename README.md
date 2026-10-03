@@ -11,6 +11,34 @@ The tested workaround uses **VirtualHere** to expose the physical USB Wi-Fi adap
 
 ---
 
+## TL;DR
+
+If your USB Wi-Fi adapter is detected by macOS but does not appear inside a Kali Linux ARM64 VM on an Apple Silicon Mac, this setup provides a tested workaround:
+
+```text
+USB Wi-Fi Adapter
+        ↓
+macOS / Apple Silicon
+        ↓
+VirtualHere USB Server
+        ↓
+UTM / Kali Linux ARM64
+        ↓
+VirtualHere ARM64 Client
+        ↓
+vhci_hcd
+        ↓
+Linux Wi-Fi driver
+        ↓
+wlan0
+        ↓
+Monitor Mode + Packet Injection
+```
+
+**Tested successfully with a Mercusys AC650 (`2c4e:0105`) using the `rtw88_8821cu` driver.**
+
+---
+
 ## Tested Configuration
 
 | Component | Status |
@@ -138,7 +166,7 @@ If macOS cannot see the adapter, troubleshoot the physical USB connection, hub, 
 
 Download the official **VirtualHere USB Server for macOS**:
 
-https://www.virtualhere.com/osx_server_software
+[VirtualHere USB Server for macOS](https://www.virtualhere.com/osx_server_software)
 
 Install and start it with the USB Wi-Fi adapter connected.
 
