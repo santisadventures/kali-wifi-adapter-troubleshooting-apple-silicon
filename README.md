@@ -1,5 +1,11 @@
 # Kali USB Wi-Fi Adapter Troubleshooting on Apple Silicon Macs
 
+![Platform](https://img.shields.io/badge/Apple%20Silicon-M--series-informational)
+![Kali](https://img.shields.io/badge/Kali%20Linux-ARM64-informational)
+![Virtualization](https://img.shields.io/badge/UTM-Tested-success)
+![Monitor Mode](https://img.shields.io/badge/Monitor%20Mode-Tested-success)
+![Packet Injection](https://img.shields.io/badge/Packet%20Injection-Tested-success)
+
 Troubleshooting guide for using external USB Wi-Fi adapters with **Kali Linux ARM64 virtualized on Apple Silicon (M-series) Macs**.
 
 This repository documents a working solution for cases where macOS detects a USB Wi-Fi adapter, but the adapter cannot be passed directly to a Kali Linux ARM64 virtual machine.
@@ -36,6 +42,83 @@ Monitor Mode + Packet Injection
 ```
 
 **Tested successfully with a Mercusys AC650 (`2c4e:0105`) using the `rtw88_8821cu` driver.**
+
+---
+
+## Quick Start
+
+Once VirtualHere Server is running on macOS and the ARM64 client is running inside Kali:
+
+```bash
+uname -m
+./vhclientarm64 -t "LIST"
+./vhclientarm64 -t "USE,<device-address>"
+lsusb
+iw dev
+```
+
+Verify monitor mode support:
+
+```bash
+iw list | sed -n '/Supported interface modes:/,/Band/p'
+```
+
+Enable monitor mode:
+
+```bash
+sudo airmon-ng check kill
+sudo ip link set wlan0 down
+sudo iw dev wlan0 set type monitor
+sudo ip link set wlan0 up
+iw dev
+```
+
+Test passive capture:
+
+```bash
+sudo airodump-ng wlan0
+```
+
+On networks you own or are authorized to test, verify packet injection with:
+
+```bash
+sudo aireplay-ng --test wlan0
+```
+
+For installation details and troubleshooting, continue with the full guide below.
+
+---
+
+## Tested Environment
+
+This is the configuration that was actually tested:
+
+| Component | Tested configuration |
+|---|---|
+| Host architecture | Apple Silicon (M-series) |
+| Virtualization | UTM |
+| Guest | Kali Linux ARM64 |
+| Kernel | `7.1.5+kali-arm64` |
+| USB transport | VirtualHere |
+| Wi-Fi adapter | Mercusys AC650 |
+| USB VID:PID | `2c4e:0105` |
+| Linux driver | `rtw88_8821cu` |
+| Monitor mode | ✅ PASS |
+| Packet injection | ✅ PASS |
+
+Results with other adapters, kernels, virtualization backends, or macOS versions may differ.
+
+---
+
+## Known Working Adapters
+
+The following hardware has been physically tested with this setup:
+
+| Adapter | USB ID | Linux Driver | Monitor Mode | Packet Injection |
+|---|---|---|---|---|
+| Mercusys AC650 | `2c4e:0105` | `rtw88_8821cu` | ✅ Tested | ✅ Tested |
+
+Other adapters may work, but should not be considered confirmed until tested. Contributions with the adapter model, USB ID, driver, and test results are welcome.
 
 ---
 
